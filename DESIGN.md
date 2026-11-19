@@ -159,8 +159,6 @@ Transport choices: TCP for downloads; UDP for periodic telemetry and supervisory
 
 | Area | Not yet assigned or verified |
 | --- | --- |
-| Section 4 | OSPF costs/reference bandwidth, B-C path and ECMP policy, failure-detection settings, and default-route origination |
-| Section 5 | BGP preference attributes/values, inbound policy, accepted provider routes, session timers, and NAT-state retention across ISP failover |
 | Section 7 | Lab node/interface names, production-to-lab mapping, robot test-host addresses, IPv6 implementation, and measured results |
 | Device configuration | Access-switch quantities/port counts, local link capacities, STP variant/priorities, and production MTU |
 | Service configuration | DNS, call-control, monitoring, administrator, and robot-controller host assignments; application-specific ACL ports |
