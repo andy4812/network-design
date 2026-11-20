@@ -159,7 +159,6 @@ Transport choices: TCP for downloads; UDP for periodic telemetry and supervisory
 
 | Area | Not yet assigned or verified |
 | --- | --- |
-| Section 7 | Lab node/interface names, production-to-lab mapping, robot test-host addresses, IPv6 implementation, and measured results |
 | Device configuration | Access-switch quantities/port counts, local link capacities, STP variant/priorities, and production MTU |
 | Service configuration | DNS, call-control, monitoring, administrator, and robot-controller host assignments; application-specific ACL ports |
 
