@@ -2,11 +2,11 @@
 
 ### 4.1 OSPF design and link costs
 
-KAS uses OSPFv2 for internal IPv4 routing and OSPFv3 for internal IPv6 routing. The three site routers (RA, RB, and RC) and the three Layer-3 distribution switches (DS-A, DS-B, and DS-C) operate in a single backbone area, Area 0. A single-area design is adequate for six internal routing devices and avoids the additional complexity of area border routers and inter-area route distribution.
+KAS uses OSPFv2 for internal IPv4 routing and OSPFv3 for internal IPv6 routing. All six routing devices—the site routers RA, RB, and RC and the distribution switches DS-A, DS-B, and DS-C—belong to Area 0. This single-area design keeps configuration and troubleshooting simple at the network's current size. Figure 4.1 shows the adjacencies and link costs.
 
-RA, RB, and RC form OSPF adjacencies over the three routed WAN links. Each site router also forms an adjacency with its corresponding distribution switch. The distribution switches advertise their connected VLAN prefixes, and all six routers advertise their loopbacks. VLAN SVIs and loopbacks are passive OSPF interfaces; only the point-to-point routed links form adjacencies. OSPFv2 and OSPFv3 use the same configured link costs to provide consistent dual-stack path selection.
+Adjacencies form over the three WAN links and each site's distribution-to-router link. Through these adjacencies, the distribution switches advertise their connected VLAN prefixes, and all six devices advertise their loopbacks. VLAN SVIs and loopbacks remain passive: their prefixes are advertised, but they do not form adjacencies. Both OSPF versions use the same link costs so IPv4 and IPv6 select the same paths.
 
-The OSPF reference bandwidth is **100 Gb/s**. We assign the interface cost using
+Interface costs use a **100 Gb/s** reference bandwidth:
 
 $$
 \text{Cost} = \frac{\text{Reference bandwidth}}{\text{Link bandwidth}}
@@ -21,28 +21,37 @@ $$
 | DS-B–RB | 10 Gb/s (assumed) | 100/10 | 10 |
 | DS-C–RC | 10 Gb/s (assumed) | 100/10 | 10 |
 
-The WAN bandwidths are given design parameters. The 10 Gb/s capacities assigned to the distribution-switch-to-router links are additional assumptions. These links must be configured explicitly with cost 10 in both routing protocols rather than relying on a router's unverified default reference bandwidth.
+The WAN capacities come from the project requirements; the local distribution-to-router links are assumed to run at 10 Gb/s. Their cost is explicitly set to 10 in both protocols to keep path selection consistent across devices.
 
-Each site has a reserved private IPv4 /20 and global IPv6 /52 allocation block (A: `10.80.0.0/20`, `2001:db8:6500:1000::/52`; B: `10.80.16.0/20`, `2001:db8:6500:2000::/52`; C: `10.80.32.0/20`, `2001:db8:6500:3000::/52`). **These are address-allocation blocks, not advertised OSPF summary routes.** In the single-area design, OSPF advertises the individual VLAN, routed-link, and loopback prefixes, including Site C's public-server subnet.
+Within Area 0, OSPF advertises individual VLAN, routed-link, and loopback prefixes, including C's public-server subnet. The site /20 and /52 allocations listed in [Section 3.4](03_addressing.md#34-site-blocks-reserves-and-summarization) reserve address space for growth; they are not advertised as OSPF summaries.
 
 ### 4.2 Least-cost paths and ECMP
 
-For the **site-router-to-site-router** paths, the OSPF cost is the sum of outgoing-interface costs along the route.
+OSPF selects the path with the lowest sum of outgoing-interface costs. Between site routers, the direct links to C have lower costs than the alternatives:
 
 | Source and destination | Normal direct path | Alternative via the third site | Selected normal path |
 | --- | --- | --- | --- |
 | RA → RC | RA–RC: 10 | RA–RB–RC: 50 + 50 = 100 | RA–RC |
 | RB → RC | RB–RC: 50 | RB–RA–RC: 50 + 10 = 60 | RB–RC |
 
-If the A–C link fails, the RA–RC route is removed. The available RA-to-RC route is **RA–RB–RC with cost 100**. The backup WAN path is limited by the 2 Gb/s links and has a one-way WAN propagation delay of `12 ms + 10 ms = 22 ms`, compared with 5 ms along the normal direct link. These figures exclude local-link, serialization, queuing, and processing delays.
+If A–C fails, RA reaches RC through RB at cost 100. This backup path restores connectivity but is limited to 2 Gb/s, with a one-way WAN propagation delay of `12 ms + 10 ms = 22 ms`, compared with 5 ms on the direct link. These delays exclude local links, serialization, queuing, and processing.
 
-For a **complete path between distribution switches**, include the additional costs at both ends. A Site A engineering workstation reaching the Site C repository follows DS-A–RA–RC–DS-C with cost `10 + 10 + 10 = 30`. After A–C fails, DS-A–RA–RB–RC–DS-C has cost `10 + 50 + 50 + 10 = 120`. Similarly, DS-B–RB–RC–DS-C has cost `10 + 50 + 10 = 70`, compared with `10 + 50 + 10 + 10 = 80` through Site A. The different totals simply reflect different endpoints; they do not change the route preference.
+Paths between distribution switches also include the local routed links at both ends:
 
-Because OSPFv3 uses the same interface costs as OSPFv2, the normal and failure paths are identical for IPv4 and IPv6. **No equal-cost alternative path exists anywhere in this modeled topology**: the WAN alternatives have unequal costs, and each site distribution switch is connected to only one site router. Thus, ECMP is not used. This is intentional: traffic normally uses the direct A–C high-capacity link, while the A–B–C route remains a backup.
+| Path | Cost | Role |
+| --- | --- | --- |
+| DS-A–RA–RC–DS-C | 10 + 10 + 10 = 30 | Normal A–C path |
+| DS-A–RA–RB–RC–DS-C | 10 + 50 + 50 + 10 = 120 | A–C backup through B |
+| DS-B–RB–RC–DS-C | 10 + 50 + 10 = 70 | Normal B–C path |
+| DS-B–RB–RA–RC–DS-C | 10 + 50 + 10 + 10 = 80 | B–C alternative through A |
+
+The extra costs leave the route preference unchanged. For example, A's engineering traffic reaches C's repository over the direct A–C link under normal conditions and through B after that link fails.
+
+Equal-cost multipath (ECMP) is not used because the WAN alternatives have different costs and each distribution switch has only one router uplink. Both address families therefore use the same single preferred path, keeping the high-capacity A–C link primary and A–B–C as its backup.
 
 ### 4.3 Expected IPv4 and IPv6 RIB/FIB entries on RA
 
-The routing information base (RIB) records the selected connected, local, OSPF-learned, and default routes. The forwarding information base (FIB) resolves each selected destination into an outgoing interface and next hop. The tables below show **expected design entries under normal conditions**, not captured IPMininet output. Representative prefixes are shown rather than every VLAN and loopback.
+The routing information base (RIB) holds routes selected from connected networks, local addresses, OSPF, and default-route sources. The forwarding information base (FIB) uses those selections to determine the outgoing interface and next hop for packets. The tables below show representative entries expected on RA under normal conditions. Captured lab routes are presented separately in [Section 7](07_validation.md).
 
 **IPv4 (RA)**
 
@@ -70,24 +79,28 @@ The routing information base (RIB) records the selected connected, local, OSPF-l
 | `2001:db8:6500:3001::/64` (C internal servers) | OSPFv3 | RC | RA–RC |
 | `::/0` | OSPFv3 external default | RC | RA–RC |
 
-IPv6 OSPFv3 next hops are normally represented by the neighbor's link-local address. These addresses are not specified in the shared design, so the IPv6 FIB view identifies the corresponding neighbor routers rather than inventing link-local values. The IPv6 /127 prefixes above match the planned RA-facing routed links.
+OSPFv3 uses the neighbor's link-local address as the next hop. Since these interface addresses are not fixed in the design, the IPv6 table identifies each next-hop router and its outgoing connection. The connected /127s match the link assignments in Section 3.
 
-RC originates an IPv4 default into OSPFv2 only while a usable IPv4 Internet default is present, and an IPv6 default into OSPFv3 only while a usable IPv6 Internet default is present. RC receives those routes using the eBGP policy in Section 5; the full Internet routing table is not imported into OSPF.
+The default entries depend on RC's Internet reachability. RC originates a default into each OSPF version only while it has a usable Internet default for that address family. Those routes come from the eBGP policy in [Section 5](05_bgp.md), keeping Internet routing inside OSPF limited to defaults.
 
-For example, a Site A workstation sending an IPv4 packet to the repository at `10.80.32.10` first sends it to its local DS-A gateway. DS-A forwards it to RA (`10.80.240.14`), RA forwards it toward RC (`10.80.240.2`), and RC sends it toward DS-C (`10.80.240.21`) and the repository VLAN. The analogous IPv6 packet to `2001:db8:6500:3001::10` traverses the same routers.
+For a packet addressed to the repository at `10.80.32.10`, A's workstation first uses its DS-A gateway. The forwarding sequence is then DS-A → RA (`10.80.240.14`) → RC (`10.80.240.2`) → DS-C (`10.80.240.21`) → repository. Traffic to the repository's IPv6 address, `2001:db8:6500:3001::10`, follows the same devices.
 
 ### 4.4 Failure detection, reconvergence, and forwarding updates
 
-The proposed WAN OSPF Hello Interval is **10 seconds** and Dead Interval is **40 seconds** for both OSPFv2 and OSPFv3. Both ends of every adjacency use matching settings. If RA or RC receives a physical link-down indication on A–C, failure processing can begin without waiting for the OSPF Dead Interval. If the interface stays up but Hello packets are not received, the adjacency is declared failed when the Dead Interval expires. Neither timer specifies a guaranteed end-to-end convergence time.
+Both OSPF versions use proposed WAN Hello and Dead intervals of **10 seconds** and **40 seconds**, with matching settings at each end of an adjacency. A physical link-down indication allows failure processing to begin immediately. If the interface stays up but Hellos stop arriving, OSPF declares the adjacency failed when the Dead interval expires. These timers govern detection, not total convergence time.
 
-When RA–RC fails, RA and RC change their link-state information and flood the relevant LSAs over the remaining OSPF adjacencies. OSPFv2 and OSPFv3 each update their own link-state database and run a shortest-path-first (SPF) calculation. The RIB selects the alternative path RA–RB–RC. Only after the resulting forwarding entries are installed does the FIB forward Site C packets through RB rather than RC.
+After detecting an A–C failure, the routing devices update forwarding in three steps:
 
-For example, the IPv4 next hop on RA for `10.80.32.0/26` changes from `10.80.240.2` (RC) to `10.80.240.6` (RB). For `2001:db8:6500:3001::/64`, the IPv6 next-hop router also changes from RC to RB over the A–B link. The distribution-switch gateways and end-system addresses remain unchanged.
+1. RA and RC update their link-state information and flood link-state advertisements (LSAs) through the remaining adjacencies.
+2. Each OSPF version updates its own link-state database and runs a shortest-path-first (SPF) calculation, selecting RA–RB–RC as the alternative path.
+3. The selected route enters the RIB, and the resulting FIB update directs RA's traffic for C through RB.
 
-Some packets may be lost during detection and convergence. TCP may retransmit data and reduce its congestion window, but an established connection can survive if the route recovers before its timeout. Once RA–RC returns and the adjacency is restored, SPF again selects the lower-cost direct path. These are expected behaviors; actual reachability and reconvergence are evaluated separately in the IPMininet validation.
+On RA, this changes the IPv4 next hop for `10.80.32.0/26` from `10.80.240.2` (RC) to `10.80.240.6` (RB). The IPv6 route to `2001:db8:6500:3001::/64` likewise uses RB over A–B. Hosts continue using their existing addresses and distribution-switch gateways throughout the change.
+
+Packets may be lost before the new forwarding entries are installed. TCP can retransmit and reduce its congestion window; an established connection may survive if connectivity returns before it times out. Once A–C and its adjacency recover, SPF selects the lower-cost direct path again. [Section 7](07_validation.md) documents the lab's route changes and post-failure reachability; active TCP survival and convergence time were not measured.
 
 ### 4.5 Routing diagram
 
-![Figure 4.1. KAS dual-stack OSPF topology, Area 0 adjacencies, configured link costs and site allocations.](../diagrams/kas_ospf_routing_bw.png)
+![KAS dual-stack OSPF topology showing Area 0 adjacencies and link costs.](../diagrams/fig4_1_kas_ospf_routing_bw.png)
 
-*Figure 4.1. KAS dual-stack OSPF routing topology with Area 0 adjacencies, link costs, and site address allocations. The site /20 and /52 blocks are allocation blocks rather than inter-area OSPF summaries.*
+*Figure 4.1. Area 0 adjacencies and link costs for both address families. Site blocks indicate address allocations.*

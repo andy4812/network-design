@@ -64,6 +64,6 @@ When ISP-1 recovers and again offers valid default routes, its higher Local Pref
 
 ### 5.6 Internet-edge diagram
 
-![Figure 5.1. KAS dual-stack eBGP connections and route policies.](../diagrams/kas_bgp_policy_bw.png)
+![Figure 5.1. KAS dual-stack eBGP connections and route policies.](../diagrams/fig5_1_kas_bgp_policy_bw.png)
 
 *Figure 5.1. KAS dual-stack eBGP peerings with both providers, their preference settings, public-prefix export restrictions, and default-route import policy.*
