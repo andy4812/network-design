@@ -1,6 +1,6 @@
 # KAS Network Design
 
-Shared parameters for the report, [topology](diagrams/topo.drawio), and lab. Unassigned values are listed at the end.
+Shared parameters for the report, [topology](diagrams/fig2_1_topology.drawio), and lab. Unassigned values are listed at the end.
 
 ## Sites and address blocks
 
@@ -57,7 +57,7 @@ Gateways are SVIs on the site's distribution switch. Every IPv6 SVI uses its lis
 | Parameter | Value |
 | --- | --- |
 | Access-switch uplinks | One logical 802.1Q uplink per switch to its local distribution switch |
-| Distribution-to-router links | Routed links, not trunks |
+| Distribution-to-router links | Routed links, not trunks; assumed 10 Gb/s at each site |
 | VLAN scope | Local to one site; no VLAN stretched over the WAN |
 | Preferred STP roots | DS-A, DS-B, DS-C for their respective sites |
 | Normal STP state | All intended uplinks forwarding; none blocked |
@@ -154,12 +154,3 @@ RC also has `203.0.113.17/32` on an additional loopback for NAT44. Advertise tha
 | Other trace assumptions | Ethernet links; no fragmentation or QoS remarking |
 
 Transport choices: TCP for downloads; UDP for periodic telemetry and supervisory control; UDP with TCP fallback for DNS; QUIC/UDP for HTTP/3. Details are in [Section 6](sections/06_transport.md).
-
-## Pending parameters
-
-| Area | Not yet assigned or verified |
-| --- | --- |
-| Device configuration | Access-switch quantities/port counts, local link capacities, STP variant/priorities, and production MTU |
-| Service configuration | DNS, call-control, monitoring, administrator, and robot-controller host assignments; application-specific ACL ports |
-
-Failure expectations and the proposed gateway-redundancy upgrade are in [Section 8](sections/08_failure_analysis.md).

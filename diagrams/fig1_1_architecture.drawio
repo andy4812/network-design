@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net">
+  <diagram id="kas-architecture" name="Architecture overview">
+    <mxGraphModel grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1200" pageHeight="670">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="connections" value="Connections" parent="0" />
+        <mxCell id="labels" value="Labels" parent="0" />
+        <mxCell id="title" value="KAS Network Architecture" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=34;fontStyle=1;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="20" y="18" width="1160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="isp1" value="ISP-1&#10;Preferred" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="100" y="110" width="250" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="isp2" value="ISP-2&#10;Backup" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="850" y="110" width="250" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="site-c" value="Site C&#10;Data center / Internet edge" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="450" y="300" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="site-a" value="Site A&#10;Headquarters" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="100" y="510" width="250" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="site-b" value="Site B&#10;Robotics lab" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="850" y="510" width="250" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="internet-1" edge="1" source="isp1" target="site-c" parent="connections" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=2.5;exitX=0.7;exitY=1;exitPerimeter=0;entryX=0.2;entryY=0;entryPerimeter=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="internet-2" edge="1" source="isp2" target="site-c" parent="connections" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=2.5;exitX=0.3;exitY=1;exitPerimeter=0;entryX=0.8;entryY=0;entryPerimeter=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wan-ac" edge="1" source="site-a" target="site-c" parent="connections" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=2.5;exitX=0.7;exitY=0;exitPerimeter=0;entryX=0.2;entryY=1;entryPerimeter=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wan-bc" edge="1" source="site-b" target="site-c" parent="connections" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=2.5;exitX=0.3;exitY=0;exitPerimeter=0;entryX=0.8;entryY=1;entryPerimeter=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wan-ab" edge="1" source="site-a" target="site-b" parent="connections" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=2.5;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="isp1-rate" value="10 Gb/s" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=21;fontStyle=0;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="320" y="226" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="isp2-rate" value="5 Gb/s" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=21;fontStyle=0;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="730" y="226" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ac-rate" value="10 Gb/s" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=21;fontStyle=0;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="320" y="425" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-rate" value="2 Gb/s" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=21;fontStyle=0;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="730" y="425" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ab-rate" value="2 Gb/s" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=21;fontStyle=0;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="525" y="535" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="caption" value="Dual-stack routing; VLANs remain within each site." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2.5;fontColor=#000000;fontFamily=Times New Roman;fontSize=20;fontStyle=0;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="labels">
+          <mxGeometry x="20" y="618" width="1160" height="35" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

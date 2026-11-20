@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net">
+  <diagram id="kas-failures" name="Failure cases and recovery">
+    <mxGraphModel grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1200" pageHeight="1000">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="KAS Failure Cases and Recovery" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=32;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="20" y="15" width="1160" height="45" />
+        </mxCell>
+        <mxCell id="legend" value="Solid: forwarding path after recovery  •  Dashed + ×: unavailable" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=21;fontStyle=0;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="20" y="63" width="1160" height="35" />
+        </mxCell>
+        <mxCell id="divide-top" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=1;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="600" y="115" />
+            <mxPoint as="targetPoint" x="600" y="455" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="divide-bottom" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=1;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="30" y="475" />
+            <mxPoint as="targetPoint" x="1170" y="475" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a-title" value="A. A–C WAN link fails" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=25;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="115" width="530" height="40" />
+        </mxCell>
+        <mxCell id="ra" value="RA / Site A" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="75" y="195" width="155" height="60" />
+        </mxCell>
+        <mxCell id="rc" value="RC / Site C" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="370" y="195" width="155" height="60" />
+        </mxCell>
+        <mxCell id="rb" value="RB / Site B" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="225" y="330" width="155" height="60" />
+        </mxCell>
+        <mxCell id="ac" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;dashed=1;dashPattern=6 4;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;" source="ra" target="rc">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="ac-failed0" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="290" y="215" />
+            <mxPoint as="targetPoint" x="310" y="235" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ac-failed1" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="290" y="235" />
+            <mxPoint as="targetPoint" x="310" y="215" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ab" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;exitX=0.5;exitY=1;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;" source="ra" target="rb">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="bc" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=1;entryPerimeter=0;" source="rb" target="rc">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="a-status" value="OSPF reroutes through B" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="70" y="405" width="460" height="32" />
+        </mxCell>
+        <mxCell id="a-rate" value="2 Gb/s backup • cost 100" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=20;fontStyle=0;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="70" y="438" width="460" height="27" />
+        </mxCell>
+        <mxCell id="b-title" value="B. ISP-1 fails" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=25;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="635" y="115" width="530" height="40" />
+        </mxCell>
+        <mxCell id="isp1" value="ISP-1" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="675" y="195" width="155" height="60" />
+        </mxCell>
+        <mxCell id="isp2" value="ISP-2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="970" y="195" width="155" height="60" />
+        </mxCell>
+        <mxCell id="edge" value="RC" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="825" y="330" width="155" height="60" />
+        </mxCell>
+        <mxCell id="provider1" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;dashed=1;dashPattern=6 4;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=1;entryPerimeter=0;" source="edge" target="isp1">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="provider2" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=1;entryPerimeter=0;" source="edge" target="isp2">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="isp-failed0" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="780" y="295" />
+            <mxPoint as="targetPoint" x="800" y="315" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="isp-failed1" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="780" y="315" />
+            <mxPoint as="targetPoint" x="800" y="295" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="b-status" value="BGP selects ISP-2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="670" y="405" width="460" height="32" />
+        </mxCell>
+        <mxCell id="b-note" value="5 Gb/s • return routing must also recover" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=20;fontStyle=0;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="620" y="438" width="560" height="27" />
+        </mxCell>
+        <mxCell id="c-title" value="C. Robotics gateway fails" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=25;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="30" y="495" width="1140" height="40" />
+        </mxCell>
+        <mxCell id="current" value="Current design" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=24;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="550" width="530" height="35" />
+        </mxCell>
+        <mxCell id="proposed" value="Proposed upgrade after DS-B failure" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=24;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="625" y="550" width="550" height="35" />
+        </mxCell>
+        <mxCell id="divide-c" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=1;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="600" y="555" />
+            <mxPoint as="targetPoint" x="600" y="960" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="robots" value="Robots" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="740" width="110" height="60" />
+        </mxCell>
+        <mxCell id="access" value="Access" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="180" y="740" width="110" height="60" />
+        </mxCell>
+        <mxCell id="ds" value="DS-B" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="325" y="740" width="110" height="60" />
+        </mxCell>
+        <mxCell id="b-router" value="RB" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="470" y="740" width="95" height="60" />
+        </mxCell>
+        <mxCell id="local" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;" source="robots" target="access">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="gateway-down" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;dashed=1;dashPattern=6 4;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;" source="access" target="ds">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="ds-up-down" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;dashed=1;dashPattern=6 4;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;" source="ds" target="b-router">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="ds-failure" value="Failed gateway / SVI" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=20;fontStyle=0;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="260" y="670" width="240" height="35" />
+        </mxCell>
+        <mxCell id="ds-cross0" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="370" y="730" />
+            <mxPoint as="targetPoint" x="390" y="750" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ds-cross1" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="370" y="750" />
+            <mxPoint as="targetPoint" x="390" y="730" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c-status" value="No alternate routed path" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=23;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="870" width="520" height="32" />
+        </mxCell>
+        <mxCell id="c-repair" value="Restore DS-B or its VLAN 220 SVI" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=20;fontStyle=0;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="908" width="520" height="30" />
+        </mxCell>
+        <mxCell id="p-robots" value="Robots" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="625" y="740" width="100" height="60" />
+        </mxCell>
+        <mxCell id="p-access" value="Access" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="765" y="740" width="100" height="60" />
+        </mxCell>
+        <mxCell id="p-ds1" value="DS-B" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="920" y="635" width="105" height="60" />
+        </mxCell>
+        <mxCell id="p-ds2" value="DS-B2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="920" y="845" width="105" height="60" />
+        </mxCell>
+        <mxCell id="p-rb" value="RB" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1075" y="740" width="95" height="60" />
+        </mxCell>
+        <mxCell id="p-local" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;" source="p-robots" target="p-access">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="p-old-access" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;dashed=1;dashPattern=6 4;exitX=0.5;exitY=0;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;" source="p-access" target="p-ds1">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="p-old-uplink" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;dashed=1;dashPattern=6 4;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0;entryPerimeter=0;" source="p-ds1" target="p-rb">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="p-new-access" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;exitX=0.5;exitY=1;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;" source="p-access" target="p-ds2">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="p-new-uplink" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=1;entryPerimeter=0;" source="p-ds2" target="p-rb">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="p-ds-failed0" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="962.5" y="625" />
+            <mxPoint as="targetPoint" x="982.5" y="645" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p-ds-failed1" edge="1" parent="1" style="edgeStyle=none;endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=3;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="962.5" y="645" />
+            <mxPoint as="targetPoint" x="982.5" y="625" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p-status" value="VRRPv3 + dual access / routed uplinks" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=21;fontStyle=1;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="625" y="920" width="550" height="32" />
+        </mxCell>
+        <mxCell id="p-note" value="Standby takes over; STP opens the alternate path" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=none;strokeWidth=2;fontColor=#000000;fontFamily=Times New Roman;fontSize=19;fontStyle=0;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="610" y="955" width="580" height="28" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
