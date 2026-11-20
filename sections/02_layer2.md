@@ -2,9 +2,13 @@
 
 ### 2.1 Physical and logical topology
 
-The [topology diagram](../diagrams/topo.drawio) ([preview](../diagrams/topo.png)) shows the three sites, site routers, distribution and access switches, WAN circuits, Internet circuits, and Layer-2 boundaries.
+Each site's access switches connect to a single Layer-3 distribution switch: DS-A, DS-B, or DS-C. These switches provide the local VLAN gateways and connect through routed links to RA, RB, and RC. The three routers form the WAN triangle, with RC also connecting to both Internet providers at Site C.
 
-At each site, access switches connect to one Layer-3 distribution switch: DS-A, DS-B, or DS-C. The distribution switch connects to its site router through a routed link. RA, RB, and RC form the WAN triangle. RC also provides the Internet edge.
+![KAS physical and logical topology](../diagrams/fig2_1_topology.png)
+
+*Figure 2.1. Physical and logical topology showing site devices, VLAN boundaries, and WAN and Internet circuits.*
+
+Solid lines show routed links; dashed lines show 802.1Q trunks. VLANs end at the local distribution switch.
 
 | Circuit | Capacity | One-way delay / role |
 | --- | --- | --- |
@@ -14,11 +18,11 @@ At each site, access switches connect to one Layer-3 distribution switch: DS-A, 
 | RC to ISP-1, AS64501 | 10 Gb/s | Preferred Internet provider |
 | RC to ISP-2, AS64502 | 5 Gb/s | Backup Internet provider |
 
-The diagram's access switches represent groups, not final equipment counts. Site A has an access group on each of its four floors. Sites B and C group access by device role. Each physical access switch has one logical uplink to its local distribution switch. No access switch connects directly to another site.
+The access-switch boxes represent groups. Site A groups access by floor, while Sites B and C group it by device role. Within each group, every physical access switch has one logical uplink to its local distribution switch, keeping all access links within the site.
 
 ### 2.2 VLAN plan and default gateways
 
-Every production VLAN has its own IPv4 subnet and IPv6 /64. Its default gateways reside on the corresponding switched virtual interface (SVI) at the local distribution switch. Subnets and gateway addresses are listed in [Section 3](03_addressing.md).
+Each production VLAN has an IPv4 subnet and an IPv6 /64, with both default gateways provided by a switched virtual interface (SVI) on the local distribution switch. The table below identifies each VLAN's role and normal traffic path; [Section 3](03_addressing.md) lists its subnet and gateway addresses.
 
 | Site | VLAN | Purpose | Gateway location | Normal traffic path |
 | --- | --- | --- | --- | --- |
@@ -37,11 +41,11 @@ Every production VLAN has its own IPv4 subnet and IPv6 /64. Its default gateways
 | C | 320 | Public-facing production services | DS-C, SVI 320 | Public service traffic uses RC and an ISP; approved management traffic stays local or arrives from A/B. |
 | C | 330 | Infrastructure, management, and central monitoring | DS-C, SVI 330 | Local administration at C; monitoring and approved administration of A/B traverse the WAN. |
 
-Guest wireless and IP phones are deployed only at A in this design. Call control is assumed to run on an internal server at C. VLANs 310 and 320 divide C's existing production-server population by exposure; they do not add another site or router. Floor-user VLANs remain floor-specific, while voice, engineering, guest, and management VLANs may span the required floors within Site A.
+At Site A, user VLANs are confined to individual floors, while voice, engineering, guest, and management VLANs extend to the floors that need them. Guest wireless and IP phones are deployed only at A, with call control hosted in C's internal-server VLAN. At C, VLANs 310 and 320 separate the existing server population into internal and public-facing services.
 
 ### 2.3 Communication between VLAN classes
 
-Inter-VLAN access is denied unless permitted below. The same policy applies to IPv4 and IPv6, including traffic arriving from another site. Access control lists (ACLs) on the distribution-switch SVIs enforce these restrictions; a separate VLAN alone does not prevent routed access. Apply rules in the appropriate ingress and egress directions so that traffic arriving through the routed site-router uplink cannot bypass the destination VLAN's policy.
+Access between VLANs is denied unless permitted below. Distribution-switch SVI access control lists (ACLs) enforce this policy for both IPv4 and IPv6. Rules cover traffic entering and leaving the VLANs, so requests arriving from another site face the same restrictions as local requests.
 
 | VLAN class | Permitted communication | Restrictions |
 | --- | --- | --- |
@@ -54,13 +58,13 @@ Inter-VLAN access is denied unless permitted below. The same policy applies to I
 | Public servers: 320 | Serve published HTTPS services to Internet and authorized internal clients; send logs to a designated collector in 330; use approved external DNS/update/time services. | Deny other access to internal KAS VLANs. Administrative access is permitted only from named management hosts. |
 | Management: 180, 230, 330 | Named administrator hosts may manage designated infrastructure and servers using SSH/HTTPS. The central monitor in 330 may poll designated devices using SNMPv3/ICMP; managed devices may send logs to it. Permit internal DNS/time and approved updates. | Membership in a management VLAN does not grant unrestricted access. Scope rules to specific source hosts, destination devices, and management services. No routine access to guests. |
 
-These rows describe permitted application flows. Ordinary switch ACLs are stateless: explicit reverse-direction entries are needed for replies, including UDP. Such entries must be limited by host and service; they do not provide stateful session validation. Permit the necessary ARP, IPv6 Neighbor Discovery/router advertisements, address configuration, and ICMP/ICMPv6 error messages so that segmentation does not break connectivity or path-MTU discovery.
+The table describes application flows; reply traffic also needs explicit ACL entries because ordinary switch ACLs are stateless. These entries are limited to the relevant hosts and services, including UDP replies, but do not validate session state. The policy also allows necessary ARP, IPv6 Neighbor Discovery and router advertisements, address configuration, and ICMP/ICMPv6 errors to support connectivity and path-MTU discovery.
 
-Devices within the same VLAN can communicate without passing through an SVI ACL. In particular, VLAN 220 isolates robotics from other classes but does not isolate individual robots from each other. Guest client isolation is therefore applied at the wireless access layer rather than relying on the gateway ACL.
+SVI ACLs apply only to routed traffic. Devices in the same VLAN communicate directly, so VLAN 220 separates robotics from other classes but leaves communication between robots within that VLAN unrestricted by the SVI ACL. Guest-to-guest restrictions are instead enforced through wireless client isolation.
 
 ### 2.4 Trunks, access ports, and routing boundaries
 
-Access-switch uplinks to DS-A, DS-B, and DS-C are IEEE 802.1Q trunks. Tagged frames identify the VLAN, and each trunk permits only the VLANs needed by its attached devices and switch management.
+Access-switch uplinks to DS-A, DS-B, and DS-C use IEEE 802.1Q trunks. Frame tags identify the VLAN, allowing each uplink to carry several VLANs while keeping their traffic separate. Each trunk permits only the VLANs required by its devices and switch management.
 
 | Access group | VLANs permitted on its distribution uplink |
 | --- | --- |
@@ -71,15 +75,27 @@ Access-switch uplinks to DS-A, DS-B, and DS-C are IEEE 802.1Q trunks. Tagged fra
 | C, server access | 310, 320, and 330 |
 | C, management access | 330 |
 
-Ordinary endpoint ports are untagged access ports in one VLAN. A phone port may carry tagged voice VLAN 150 and untagged data in its floor-user VLAN. A guest AP uplink carries guest VLAN 170 and management VLAN 180, with the guest SSID mapped to 170. Management VLANs on access-switch uplinks serve switch/AP management; ordinary devices are not placed in those VLANs. All production VLANs are tagged on switch-to-switch trunks; VLAN 1 is not used for production, and unused ports are disabled.
+Endpoint ports use the following assignments:
 
-Traffic within one VLAN is switched locally. Traffic between two VLANs at the same site is routed by the distribution switch's SVIs and checked against its ACLs. Remote traffic then follows the routed uplink to RA, RB, or RC and crosses the WAN. For example, an engineering workstation reaches the repository through `VLAN 160 -> DS-A -> RA -> WAN -> RC -> DS-C -> VLAN 310`.
+- **Ordinary devices:** untagged access ports in one VLAN.
+- **Phones with attached computers:** tagged voice VLAN 150 and untagged data in the floor-user VLAN.
+- **Guest access points:** guest VLAN 170 and management VLAN 180, with the guest SSID mapped to 170.
 
-The distribution-switch-to-router links and all WAN links are Layer-3 links, not VLAN trunks. Every VLAN is a separate broadcast domain that ends at its site's distribution switch. No Layer-2 domain is stretched between sites: Ethernet broadcasts and ARP remain local, and IPv6 link-local discovery remains on its local link. WAN redundancy is provided by OSPFv2 and OSPFv3 in Area 0.
+Management VLANs carry switch and access-point administration; ordinary endpoints use their assigned device VLANs. All production VLANs are tagged on switch-to-switch trunks. VLAN 1 is unused for production, and unused ports are disabled.
+
+The destination determines where forwarding occurs:
+
+- **Same VLAN:** the access and distribution switches forward traffic locally at Layer 2.
+- **Different VLAN, same site:** the distribution switch routes traffic through its SVIs, subject to ACLs.
+- **Different site:** the distribution switch forwards permitted traffic to the site router and across the WAN.
+
+For example, an engineering workstation reaches the repository through `VLAN 160 -> DS-A -> RA -> RC -> DS-C -> VLAN 310` over the normal A-C path.
+
+The distribution-to-router and WAN links carry routed traffic, so VLAN broadcast domains stop at the local distribution switch. Ethernet broadcasts, ARP, and IPv6 link-local discovery stay within their local Layer-2 domains. OSPFv2 and OSPFv3 provide alternate WAN paths in Area 0 without extending VLANs between sites.
 
 ### 2.5 Spanning tree and failure tradeoff
 
-DS-A, DS-B, and DS-C are the preferred STP roots for their respective sites. With one logical uplink per access switch and no switch-to-switch access links, the intended Layer-2 topology contains no loops. Access-switch uplinks are forwarding root ports; distribution downlinks are forwarding designated ports. No uplink is normally blocked. STP remains enabled to protect against accidental redundant connections; endpoint ports use edge-port behavior and BPDU Guard, while switch uplinks do not.
+DS-A, DS-B, and DS-C are the preferred spanning-tree protocol (STP) roots at their respective sites. Each access switch has one logical uplink and no links to other access switches, giving the intended Layer-2 topology no loops. Access uplinks therefore forward as root ports, and distribution downlinks forward as designated ports; no uplink is normally blocked. STP remains enabled to protect against accidental redundant connections. Endpoint-facing ports use edge-port behavior and BPDU Guard; switch-to-switch links use normal STP participation without these endpoint settings.
 
-This design favors simple operation and predictable forwarding over local redundancy. An access-uplink failure disconnects that access switch. A distribution-switch failure removes that site's VLAN gateways; failure of DS-B or its VLAN 220 SVI therefore interrupts routed robotics access, with no backup gateway. STP cannot restore these missing paths. The WAN triangle provides alternate routed paths for WAN-link failures, but it does not protect against a local distribution-switch or gateway failure.
+This simple topology accepts local outages in exchange for fewer switches and links. An uplink failure disconnects its access switch, while a distribution-switch failure removes the site's VLAN gateways. At B, either a DS-B failure or a VLAN 220 SVI failure interrupts routed robotics access because there is no backup gateway. STP cannot replace a failed path in this topology, and the WAN triangle protects only against WAN-link failures. The effect on robotics and the proposed gateway upgrade are covered in [Section 8](08_failure_analysis.md).
 

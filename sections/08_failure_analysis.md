@@ -1,45 +1,47 @@
 ## 8. Failure Analysis, Operations, and Design Review
 
-Each case assumes the other devices and links remain operational. These are expected outcomes, not measured recovery times.
+The three cases below follow each failure from the initial disruption through route recovery and its effect on TCP. Each assumes that all other devices and links remain operational.
+
+![WAN and ISP backup paths, robotics gateway outage, and proposed gateway redundancy.](../diagrams/fig8_1_failure_recovery.png)
+
+*Figure 8.1. Failure paths for both address families. The lower-right view shows the proposed upgrade in Section 8.4.*
 
 ### 8.1 Failure A: A-C WAN link fails during a download
 
-**Immediate effect.** Packets using A-C are lost until forwarding entries change. The Section 6 download stalls, and packets already in flight may arrive out of order during the route change.
+**Immediate effect.** Packets sent over the failed A-C link are lost, stalling the download described in Section 6. During the route change, packets already in flight may also arrive out of order.
 
-**Control plane.** RA and RC detect the failure through link-down indications or OSPF neighbor timeout. OSPFv2 and OSPFv3 update and flood their link-state information. Routers run SPF, update their routing tables, and install new next hops in the forwarding tables. The two protocols converge independently; recovery in one does not prove recovery in the other.
+**Control plane.** A physical link-down indication lets RA and RC begin failure processing immediately. If the interface stays up but Hellos stop arriving, OSPF detects the lost neighbor when the proposed 40-second Dead interval expires; Hellos are normally sent every 10 seconds. The routers then flood updated link-state information, run SPF, update the RIB, and install new FIB entries. OSPFv2 and OSPFv3 converge independently, so their recovery times may differ. The detection timers alone do not determine total recovery time.
 
-**Stable path.** Download data travels `C -> RC -> RB -> RA -> A`; ACKs return through `A -> RA -> RB -> RC -> C`. The distribution switches and endpoint VLANs are unchanged. The remaining WAN path has a nominal bottleneck of 2 Gb/s, shared with B's traffic. Its one-way propagation delay is `10 + 12 = 22 ms`, giving at least 44 ms round-trip propagation before other delays.
+**Stable path.** With the costs defined in Section 4, A-C at cost 10 is replaced by A-B-C at cost `50 + 50 = 100`. Download data crosses RC → RB → RA, with ACKs returning in the opposite direction. On RA, the repository's IPv4 next hop changes from `10.80.240.2` (RC) to `10.80.240.6` (RB); the IPv6 next-hop router also changes to RB. The backup shares its 2 Gb/s bottleneck with B's traffic and has `10 + 12 = 22 ms` of one-way WAN propagation, giving a minimum 44 ms round-trip propagation delay. When A-C and its adjacencies recover, both protocols return to the lower-cost direct route. Neither state uses ECMP.
 
-**TCP impact.** Addresses and ports remain unchanged, so existing connections can resume after convergence. TCP retransmits missing data and may reduce its congestion window following loss. Throughput is likely lower because the alternate path has less capacity and greater delay. A connection can still fail if TCP or the application times out before connectivity returns.
+**TCP impact.** Because addresses and ports remain unchanged, existing connections can resume if connectivity returns before TCP or the application times out. TCP retransmits missing data and may reduce its congestion window after loss. Even after recovery, the backup path's lower capacity and greater delay are likely to reduce throughput.
 
 ### 8.2 Failure B: ISP-1 fails during IPv4 and IPv6 sessions
 
-**Immediate effect.** Internet traffic using ISP-1 is dropped while RC and external networks still select the failed path. Internal KAS traffic continues to use the WAN.
+**Immediate effect.** Internet packets are lost while RC or external networks still forward them toward ISP-1. Internal KAS traffic continues over the WAN.
 
-**Control plane.** Link failure or BGP session timeout invalidates routes learned through ISP-1. RC selects usable ISP-2 routes and updates its forwarding tables for both address families. External networks must also select the KAS announcements through ISP-2; changing RC's outbound route alone does not restore the return path. IPv4 and IPv6 may recover at different times. [RFC 4271](https://www.rfc-editor.org/rfc/rfc4271.html#section-9.1)
+**Control plane.** Under Section 5's import policy, RC accepts only defaults, with Local Preference 200 for ISP-1 and 100 for ISP-2. Once ISP-1's defaults become unusable, RC selects ISP-2 and updates its FIB. The proposed BGP Keepalive and Hold intervals are 30 and 90 seconds; a physical link-down indication can trigger earlier detection. RC continues advertising an internal default for each address family while a usable upstream default remains. IPv4 and IPv6 are evaluated independently. [RFC 4271](https://www.rfc-editor.org/rfc/rfc4271.html#section-9.1)
 
-**Stable path.** Internet traffic passes through `KAS -> RC -> ISP-2`, with return traffic through ISP-2 to RC. This requires ISP-2 to provide both IPv4 and IPv6 transit and carry both public aggregates from Section 3. The available Internet circuit is now 5 Gb/s. RC remains the internal Internet exit; the inter-site topology has not changed.
+**Stable path.** Outbound Internet traffic follows KAS → RC → ISP-2 over the 5 Gb/s circuit. RC continues advertising both public aggregates through ISP-2 with two additional AS65050 prepends. Return traffic recovers only after external networks select that path, so RC's outbound change alone is insufficient to restore a session. Internal WAN paths remain unchanged. When ISP-1 supplies usable defaults again, Local Preference makes it the preferred outbound provider; the return path still depends on external routing policies and convergence.
 
-**TCP impact.** RC remains operational. Private-IPv4 sessions can resume if RC retains their NAT mappings, including public address `203.0.113.17` and translated ports, and the return route becomes usable before timeout. NAT mappings must remain usable across the egress-interface change. Public-server IPv4 sessions retain their public addresses. IPv6 sessions retain their global addresses and need no NAT state, but still depend on bidirectional route recovery. None of these sessions is guaranteed to survive a long outage.
+**TCP impact.** The design requires RC to retain its NAT44 mappings, including `203.0.113.17` and the existing translated ports, when the outgoing provider changes. Private-IPv4 sessions can then resume if those mappings remain valid and return routing recovers before endpoint timeouts. Public-server IPv4 and native IPv6 sessions keep their addresses without translation, but also depend on timely route recovery. All may experience loss and retransmissions. The lab did not test NAT-state retention or session survival.
 
 ### 8.3 Failure C: Site B robotics gateway fails
 
-**Immediate effect.** VLAN 220 loses routed access through DS-B: IPv4 gateway `10.80.16.1` and IPv6 default router `fe80::1` on that VLAN become unavailable. Robot-to-server traffic and remote engineering control stop. If only the SVI fails, same-VLAN switching can continue. If DS-B fails completely, endpoints on the same working access switch may still communicate, but paths through DS-B are lost.
+**Immediate effect.** VLAN 220 loses its IPv4 gateway, `10.80.16.1`, and IPv6 default router, `fe80::1`, stopping robot-to-server traffic and remote engineering control. The effect on local traffic depends on the failure: an SVI-only outage can leave same-VLAN switching operational, while a complete DS-B outage removes all paths through that switch. Endpoints on the same working access switch may still communicate.
 
-**Control plane.** When DS-B detects its SVI is down, it withdraws the robotics prefixes from OSPFv2/OSPFv3. If DS-B itself fails, RB detects the lost adjacency and the routing protocols remove paths through DS-B. ARP and Neighbor Discovery cannot select a replacement gateway because none is configured. A forwarding fault that leaves the SVI and routing adjacency up may instead leave stale routes until detected operationally.
+**Control plane.** If DS-B detects that its robotics SVI is down, it withdraws the VLAN's prefixes from both OSPF versions. If the entire switch fails, RB detects the lost adjacency and OSPF removes paths through DS-B. Neither ARP nor Neighbor Discovery can provide a replacement gateway because none is configured. A forwarding fault that leaves the SVI and adjacency up may leave stale routes until operational checks detect it.
 
-**Stable path.** There is no alternate routed path for VLAN 220. The gateway remains a single point of failure until DS-B or its SVI is restored. The WAN triangle cannot replace a failed local gateway. An SVI-only failure need not interrupt B's other VLANs; a complete DS-B failure affects all of them.
+**Stable path.** VLAN 220 remains without routed access until DS-B or its SVI is restored. The WAN triangle offers no alternative to this local gateway. An SVI-only outage can leave B's other VLANs operational, whereas a complete DS-B failure removes every VLAN gateway at B.
 
-**TCP impact.** Connections crossing the robotics gateway stop receiving acknowledgments, retransmit, and eventually time out if the outage persists. They may resume after a short repair if endpoint connection state survives. Same-switch, same-VLAN connections can remain active.
+**TCP impact.** Connections crossing the gateway stop receiving acknowledgments and retransmit until connectivity returns or they time out. A short repair may allow them to resume if both endpoints retain their connection state. Connections within the same VLAN on a working access switch can remain active.
 
-### 8.4 Remaining checks
+### 8.4 Engineering review
 
-- **Section 4:** confirm that both routing protocols prefer A-C normally and select A-B-C after failure; specify failure-detection settings.
-- **Section 5:** confirm usable ISP-2 routes and public-prefix advertisements in both address families, and NAT-state retention when changing Internet interfaces.
-- **Section 7:** record reachability and forwarding routes after the A-C failure. If the lab uses static IPv6, distinguish its lack of automatic rerouting from the production OSPFv3 design. Report interruption durations only if measured.
+Local gateway availability is the main weakness: losing a site's sole distribution switch removes its gateways even when every WAN circuit is healthy. Internet access has a similar dependency on RC, which remains a single point of failure despite the two providers.
 
-### 8.5 Engineering review
+The first upgrade would add a second distribution switch at B to protect robotics access. It would require:
 
-The weakest part is local gateway availability: redundant WAN circuits do not protect a site from losing its sole distribution switch. RC is also a single point of failure for Internet access despite the two providers.
-
-The first improvement would be a second distribution switch at B, where gateway loss interrupts robotics traffic. Give each access switch an uplink to both distribution switches, provide independent routed uplinks to RB, and use VRRPv3 for IPv4 and IPv6 gateway failover. The existing gateway addresses would become virtual addresses, with separate addresses for each switch. The redundant Layer-2 design would require primary/secondary STP roots and alternate blocked paths, with the active gateways aligned to the primary root. This is a proposed upgrade, not redundancy present in the current topology. [RFC 9568](https://www.rfc-editor.org/rfc/rfc9568.html#section-1)
+- An uplink from each access switch to both distribution switches, plus independent routed uplinks from those switches to RB.
+- VRRPv3 for IPv4 and IPv6 gateway failover, using the existing gateway addresses as virtual addresses and assigning separate addresses to each switch. [RFC 9568](https://www.rfc-editor.org/rfc/rfc9568.html#section-1)
+- Primary and secondary STP roots, with alternate paths blocked during normal operation and the active gateways aligned with the primary root.
