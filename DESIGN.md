@@ -126,7 +126,7 @@ RC also has `203.0.113.17/32` on an additional loopback for NAT44. Advertise tha
 | Internal IPv6 routing | OSPFv3, Area 0 |
 | Site summaries | /20 and /52 blocks are allocation aggregates; no inter-area summarization in the current single-area design |
 | Internal advertisements | Individual VLAN, internal-link, and loopback prefixes, including C's public-server /28 |
-| Normal A-C path | Direct RA-RC, required by the Section 6 trace; costs pending Section 4 |
+| Normal A-C path | Direct RA-RC, required by the Section 6 trace|
 | A-C failure path | RA-RB-RC and reverse |
 | External routing | IPv4 and IPv6 eBGP at RC with both providers |
 | KAS Internet advertisements | 203.0.113.0/24; 2001:db8:6500::/48 |
