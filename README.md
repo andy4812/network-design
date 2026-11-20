@@ -19,6 +19,12 @@ sudo python3 kas.py
 At the `mininet>` prompt, run `nodes` and `links` to check the topology.
 If Python reports `ModuleNotFoundError: No module named 'ipmininet'`,
 use the course VM or follow the [official IPMininet setup guide](https://ipmininet.readthedocs.io/en/latest/install.html).
+
+The repository includes the [IPMininet v1.1 source archive](third_party/ipmininet-v1.1.zip),
+packaged from [upstream commit `5fab96c`](https://github.com/cnp3/ipmininet/tree/5fab96c1e9fea629dccaf20fcc8f2d753b0d5209). The archive includes the upstream GPLv2 license.
+To install from the archive on a compatible Linux setup, use `python3 -m pip install ./third_party/ipmininet-v1.1.zip` in the Python environment that will run the lab.
+Follow the [official IPMininet setup guide](https://ipmininet.readthedocs.io/en/latest/install.html) for Mininet and the required system daemons, including FRRouting.
+
 ## Project files
 
 | Location | Contents |
