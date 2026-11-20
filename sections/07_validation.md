@@ -35,7 +35,7 @@ The `aRouter ip route` output contained OSPF-learned `10.80.32.0/26` via `10.80.
 
 *Figure 7.3. Site A IPv4 and IPv6 forwarding entries after OSPFv2 and OSPFv3 converged.*
 
-The OSPF interface checks with `vtysh -c "show ip ospf interface ..."` independently confirmed **Cost 10** on the A–C interface and **Cost 50** on the A–B interface. Both interfaces had one fully adjacent neighbor in Area 0. The displayed Linux routing-table `metric 20` is not the configured per-interface OSPF cost. The VM used OSPF Hello/Dead intervals of **200 ms/1 s**, whereas the production design proposes **10 s/40 s**; the lab timers are not a claimed production failover guarantee.
+The OSPF interface checks with `vtysh -c "show ip ospf interface ..."` independently confirmed **Cost 10** on the A–C interface and **Cost 50** on the A–B interface. Both interfaces had one fully adjacent neighbor in Area 0. The displayed Linux routing-table `metric 20` is not the configured per-interface OSPF cost. The lab's OSPFv2 interface output showed a Hello interval of **200 ms** and a Dead interval of **1 s**. The production design proposes Hello and Dead intervals of **10 s** and **40 s**, respectively.
 
 ### 7.4 TCP throughput measurement
 
@@ -68,7 +68,7 @@ With A–C still down, IPv4 and IPv6 pings from `aHost` to `cServer` each return
 
 ![WAN link-down routing and reachability](../diagrams/fig7_6_wan_failover.png)
 
-*Figure 7.6. With A–C down, both address families route via Site B and retain end-to-end connectivity.*
+*Figure 7.6. After A–C was disconnected, IPv4 and IPv6 traffic regained end-to-end connectivity via Site B once OSPF converged.*
 
 Finally, `link aRouter cRouter up` restored the direct link. On `aRouter`, `ip route get 10.80.32.10` again resolved via **`10.80.240.2` on `aRouter-eth0`**, and `ip -6 route get 2001:db8:6500:3001::10` again used `aRouter-eth0`. A final IPv4 ping returned **3/3 replies with 0% loss**. The link restoration and route preference therefore behaved as expected.
 
